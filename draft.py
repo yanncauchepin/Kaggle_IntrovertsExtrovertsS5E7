@@ -14,6 +14,7 @@ import xgboost as xgb
 from catboost import CatBoostClassifier
 from skorch import NeuralNetClassifier
 from scipy.stats import uniform, randint
+from datetime import datetime
 
 try:
     train_df = pd.read_csv("/kaggle/input/playground-series-s5e7/train.csv")
@@ -132,8 +133,8 @@ random_search = RandomizedSearchCV(
     cv=3,      
     scoring='accuracy',
     verbose=2,
-    random_state=42,
-    n_jobs=-1 
+    random_state=int(datetime.now().strftime("%M%S")),
+    n_jobs=-1
 )
 
 print("Starting Randomized Search for hyperparameter tuning...")
