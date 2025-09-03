@@ -15,14 +15,17 @@ from catboost import CatBoostClassifier
 from skorch import NeuralNetClassifier
 from scipy.stats import uniform, randint
 from datetime import datetime
+from pathlib import Path
+
+N_ITER = 1
 
 try:
+    local_data_path = Path("C:\\Users\\yanncauchepin\\Datasets\\Datatables\\kaggle_introvertsextrovertss5e7")
+    train_df = pd.read_csv(Path(local_data_path, "train.csv"))
+    test_df = pd.read_csv(Path(local_data_path, "test.csv"))
+except FileNotFoundError:
     train_df = pd.read_csv("/kaggle/input/playground-series-s5e7/train.csv")
     test_df = pd.read_csv("/kaggle/input/playground-series-s5e7/test.csv")
-except FileNotFoundError:
-    local_data_path = "c:\\users\\cauchepy\\Datasets\\Datatables\\kaggle_introvertsextraverts\\"
-    train_df = pd.read_csv(f"{local_data_path}train.csv")
-    test_df = pd.read_csv(f"{local_data_path}test.csv")
 
 target_col = 'Personality'
 le = LabelEncoder()
@@ -129,7 +132,7 @@ param_distributions = {
 random_search = RandomizedSearchCV(
     final_pipeline,
     param_distributions=param_distributions,
-    n_iter=30,
+    n_iter=N_ITER,
     cv=3,      
     scoring='accuracy',
     verbose=2,
@@ -161,7 +164,9 @@ submission_df = pd.DataFrame({
     'Personality': test_predictions
 })
 
-submission_df.to_csv('submission_random_search.csv', index=False)
+submission_save_path = Path(Path(__file__).parent, f"submission_{accuracy:.4f}.csv")
 
-print("\nSubmission file 'submission_random_search.csv' created successfully!")
+submission_df.to_csv(submission_save_path, index=False)
+
+print(f"\nSubmission file '{submission_save_path.name}' created successfully!")
 print(submission_df.head())
